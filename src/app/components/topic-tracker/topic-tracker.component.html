@@ -1,0 +1,147 @@
+<div class="topic-tracker">
+    <div class="header">
+        <h2>Full Stack Prep Tracker</h2>
+        <div class="progress-summary">
+            <div class="overall-progress">
+                <h3>Overall Progress</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="getOverallProgress()"></div>
+                    <span class="progress-text">{{ getOverallProgress() | number:'1.0-1' }}%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+    <!-- Category Tabs -->
+    <div class="category-header-bar">
+        <div class="category-tabs">
+            <button *ngFor="let category of categories" class="tab-button"
+                [class.active]="selectedCategory === category" (click)="selectedCategory = category">
+                {{ category }}
+                <span class="tab-progress" *ngIf="getProgressForCategory(category)">
+                    {{ getProgressForCategory(category)?.completed }}/{{ getProgressForCategory(category)?.total }}
+                    ({{ getProgressForCategory(category)?.percentage | number:'1.0-1' }}%)
+                </span>
+            </button>
+        </div>
+        <button class="btn btn-primary add-topic-button" (click)="showAddForm = !showAddForm">
+            {{ showAddForm ? 'Cancel' : '+ Add Topic' }}
+        </button>
+    </div>
+
+    <!-- Topics List -->
+    <div class="topics-section">
+        <div class="section-header">
+            <h3>{{ selectedCategory }} Topics</h3>
+        </div>
+
+        <!-- Add Topic Form -->
+        <div *ngIf="showAddForm" class="add-topic-form">
+            <div class="form-group">
+                <label for="topicName">Topic Name *</label>
+                <input type="text" id="topicName" [(ngModel)]="newTopic.name" placeholder="Enter topic name"
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="topicCategory">Category</label>
+                <select id="topicCategory" [(ngModel)]="newTopic.category" class="form-control">
+                    <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="topicNotes">Notes</label>
+                <textarea id="topicNotes" [(ngModel)]="newTopic.notes" placeholder="Optional notes" rows="2"
+                    class="form-control"></textarea>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-primary" (click)="addTopic()" [disabled]="loading">
+                    {{ loading ? 'Adding...' : 'Add Topic' }}
+                </button>
+                <button class="btn btn-secondary" (click)="resetAddForm()">Reset</button>
+            </div>
+        </div>
+
+        <!-- Topics List -->
+        <div class="topics-list" *ngIf="getTopicsByCategory(selectedCategory).length > 0">
+            <div *ngFor="let topic of getTopicsByCategory(selectedCategory)" class="topic-item"
+                [class.completed]="topic.isCompleted">
+
+                <div class="topic-main">
+                    <div class="topic-checkbox">
+                        <input type="checkbox" [checked]="topic.isCompleted" (change)="toggleTopicCompletion(topic)"
+                            id="topic-{{ topic.id }}">
+                        <label for="topic-{{ topic.id }}" class="checkbox-label">
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>
+
+                    <div class="topic-content">
+                        <!-- Edit Mode -->
+                        <div *ngIf="editingTopic?.id === topic.id" class="edit-topic-form">
+                            <div class="form-group">
+                                <label>Topic Name *</label>
+                                <input type="text" [(ngModel)]="editTopic.name" placeholder="Enter topic name"
+                                    class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select [(ngModel)]="editTopic.category" class="form-control">
+                                    <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Notes</label>
+                                <textarea [(ngModel)]="editTopic.notes" placeholder="Optional notes" rows="2"
+                                    class="form-control"></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button class="btn btn-primary" (click)="saveEditTopic()">Save</button>
+                                <button class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
+                            </div>
+                        </div>
+
+                        <!-- View Mode -->
+                        <div *ngIf="editingTopic?.id !== topic.id" class="topic-view">
+                            <div class="topic-header">
+                                <h4 class="topic-name" [class.completed-text]="topic.isCompleted">
+                                    {{ topic.name }}
+                                </h4>
+                                <div class="topic-toolbar">
+                                    <button type="button" class="icon-button" title="Edit topic"
+                                        (click)="startEditTopic(topic)">✏️</button>
+                                    <button type="button" class="icon-button delete" title="Delete topic"
+                                        (click)="deleteTopic(topic)">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path
+                                                d="M3 6h18v2H3V6zm3 3h12l-1.2 12.8c-.1 1.1-.9 1.9-2 1.9H8.2c-1.1 0-1.9-.8-2-1.9L5 9zm5 2v8h2v-8H10zm-4 0v8h2v-8H6zm8 0v8h2v-8h-2zM9 4V3h6v1h5v2H4V4h5z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="topic-details" *ngIf="topic.isCompleted">
+                                <div class="detail-group">
+                                    <label>Completed:</label>
+                                    <input type="date" [value]="getDateString(topic.dateCompleted)"
+                                        (change)="updateTopicDate(topic, $any($event.target).value)" class="date-input">
+                                </div>
+                            </div>
+
+                            <div class="topic-notes">
+                                <textarea [value]="topic.notes || ''"
+                                    (input)="updateTopicNotes(topic, $any($event.target).value)"
+                                    placeholder="Add notes..." rows="2" class="notes-input"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="getTopicsByCategory(selectedCategory).length === 0" class="no-topics">
+            <p>No topics found for {{ selectedCategory }}.</p>
+        </div>
+    </div>
+</div>

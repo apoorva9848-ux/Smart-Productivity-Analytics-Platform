@@ -1,0 +1,30 @@
+<div class="container">
+    <header>
+        <h1>{{ title }}</h1>
+        <nav class="nav-tabs">
+            <button class="nav-tab" [class.active]="activeTab === 'daily'" (click)="setActiveTab('daily')">
+                Daily Tracker
+            </button>
+            <button class="nav-tab" [class.active]="activeTab === 'dsa'" (click)="setActiveTab('dsa')">
+                DSA Tracker
+            </button>
+            <button class="nav-tab" [class.active]="activeTab === 'topics'" (click)="setActiveTab('topics')">
+                Topics Tracker
+            </button>
+            <button class="nav-tab" [class.active]="activeTab === 'dashboard'" (click)="setActiveTab('dashboard')">
+                Dashboard
+            </button>
+            <button class="nav-tab" [class.active]="activeTab === 'insights'" (click)="setActiveTab('insights')">
+                AI Insights
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <app-daily-tracker *ngIf="activeTab === 'daily'"></app-daily-tracker>
+        <app-dsa-tracker *ngIf="activeTab === 'dsa'"></app-dsa-tracker>
+        <app-topic-tracker *ngIf="activeTab === 'topics'"></app-topic-tracker>
+        <app-dashboard *ngIf="activeTab === 'dashboard'"></app-dashboard>
+        <app-ai-insights *ngIf="activeTab === 'insights'"></app-ai-insights>
+    </main>
+</div>

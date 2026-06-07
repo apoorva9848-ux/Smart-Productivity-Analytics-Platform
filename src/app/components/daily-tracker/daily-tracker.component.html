@@ -1,0 +1,28 @@
+<div class="daily-tracker-container">
+    <div class="header">
+        <h1>Activity-Based Daily Tracker</h1>
+        <p class="subtitle">Log work as activities instead of fixed DSA/Theory/Project fields.</p>
+    </div>
+
+    <div class="date-picker">
+        <label for="selectedDate">Selected Date</label>
+        <input id="selectedDate" type="date" [value]="selectedDate" (change)="onDateChange($event)" />
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+        <span>{{ errorMessage }}</span>
+    </div>
+
+    <app-daily-log-form [selectedDate]="selectedDate" (onSuccess)="onActivityAdded()">
+    </app-daily-log-form>
+
+    <div *ngIf="isLoading" class="loading">
+        <p>Loading activities...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="logs-section">
+        <app-daily-logs-table [activities]="activities" [selectedDate]="selectedDate"
+            (activityDeleted)="onActivityDeleted($event)">
+        </app-daily-logs-table>
+    </div>
+</div>

@@ -1,0 +1,21 @@
+<div class="logs-list-container">
+    <div class="list-header">
+        <h2>Activities for {{ selectedDate }}</h2>
+    </div>
+
+    <div *ngIf="activities.length === 0" class="no-data">
+        <p>No activities logged for this day.</p>
+    </div>
+
+    <div *ngIf="activities.length > 0" class="activities-list">
+        <div *ngFor="let activity of activities" class="activity-item">
+            <span class="activity-content">
+                {{ getActivityIcon(activity.type) }} {{ activity.description }}
+                <span *ngIf="activity.durationInMinutes" class="duration">({{ activity.durationInMinutes }} mins)</span>
+            </span>
+            <button class="btn btn-danger btn-sm delete-btn" (click)="deleteActivity(activity.id)">
+                Delete
+            </button>
+        </div>
+    </div>
+</div>

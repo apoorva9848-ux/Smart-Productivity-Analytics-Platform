@@ -1,0 +1,61 @@
+<div class="dsa-problem-form">
+    <h3>Add New Problem</h3>
+
+    <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+    <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+
+    <form (ngSubmit)="onSubmit()" [class.submitted]="submitted">
+        <div class="form-group">
+            <label for="name">Problem Name *</label>
+            <input type="text" id="name" [(ngModel)]="formData.name" name="name"
+                placeholder="e.g., Two Sum, Merge Sorted Array" [class.is-invalid]="submitted && !formData.name">
+            <small *ngIf="submitted && !formData.name" class="error-text">Problem name is required</small>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="difficulty">Difficulty *</label>
+                <select id="difficulty" [(ngModel)]="formData.difficulty" name="difficulty">
+                    <option *ngFor="let diff of difficulties" [value]="diff">{{ diff }}</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="dateSolved">Date Solved *</label>
+                <input type="date" id="dateSolved" [value]="getDateString()" (change)="setDateFromEvent($event)"
+                    name="dateSolved">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="pattern">Pattern</label>
+                <select id="pattern" [(ngModel)]="formData.pattern" name="pattern">
+                    <option value="">Select a pattern</option>
+                    <option *ngFor="let pat of patterns" [value]="pat">{{ pat }}</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="link">Link</label>
+                <input type="url" id="link" [(ngModel)]="formData.link" name="link"
+                    placeholder="https://leetcode.com/...">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea id="notes" [(ngModel)]="formData.notes" name="notes"
+                placeholder="Add any notes about the solution" rows="3"></textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="loading">
+                {{ loading ? 'Adding...' : 'Add Problem' }}
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="resetForm()">
+                Clear
+            </button>
+        </div>
+    </form>
+</div>

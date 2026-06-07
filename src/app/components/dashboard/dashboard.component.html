@@ -1,0 +1,219 @@
+<section class="dashboard-page">
+    <div class="dashboard-header">
+        <div>
+            <h2>Dashboard</h2>
+            <p>Track performance, workload distribution, and monthly progress at a glance.</p>
+        </div>
+        <div class="month-input">
+            <label for="monthPicker">Month</label>
+            <input id="monthPicker" type="month" [(ngModel)]="selectedMonth" (change)="loadDashboard()" />
+        </div>
+    </div>
+
+    <div *ngIf="loading" class="dashboard-loading">Loading dashboard data...</div>
+    <div *ngIf="error" class="dashboard-error">{{ error }}</div>
+
+    <div *ngIf="!loading && !error">
+        <div class="summary-grid">
+            <article class="summary-card">
+                <h3>Total Score</h3>
+                <p>{{ summary?.totalScore || 0 }}</p>
+            </article>
+            <article class="summary-card">
+                <h3>Active Days</h3>
+                <p>{{ summary?.activeDays || 0 }}</p>
+            </article>
+            <article class="summary-card">
+                <h3>Total Activities</h3>
+                <p>{{ summary?.totalActivities || 0 }}</p>
+            </article>
+            <article class="summary-card">
+                <h3>Missed Days</h3>
+                <p>{{ summary?.missedDays || 0 }}</p>
+            </article>
+        </div>
+
+        <div class="dashboard-panels">
+            <section class="panel heatmap-panel">
+                <div class="panel-header">
+                    <h3>Heatmap</h3>
+                    <span>Daily productivity intensity</span>
+                </div>
+                <div class="heatmap-grid">
+                    <div *ngFor="let day of heatmap; trackBy: trackByDate" class="heatmap-cell"
+                        [class.level-0]="day.score === 0" [class.level-1]="day.score > 0 && day.score < 25"
+                        [class.level-2]="day.score >= 25 && day.score < 50"
+                        [class.level-3]="day.score >= 50 && day.score < 75" [class.level-4]="day.score >= 75"
+                        [attr.title]="day.date + ': ' + day.score + ' pts'">
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel trends-panel">
+                <div class="panel-header">
+                    <h3>Trend</h3>
+                    <span>Score changes over the selected month</span>
+                </div>
+                <div class="chart-wrapper" *ngIf="trends?.length; else noTrend">
+                    <svg viewBox="0 0 520 180" class="trend-chart">
+                        <path [attr.d]="trendPath" class="trend-line" />
+                    </svg>
+                    <div class="trend-labels">
+                        <span *ngFor="let item of trends">{{ item.date | slice:8:10 }}</span>
+                    </div>
+                </div>
+                <ng-template #noTrend>
+                    <p class="empty-state">No trend data available for this month.</p>
+                </ng-template>
+            </section>
+        </div>
+
+        <div class="dashboard-panels">
+            <section class="panel distribution-panel">
+                <div class="panel-header">
+                    <h3>Work Distribution</h3>
+                    <span>Activity type breakdown</span>
+                </div>
+                <div class="distribution-chart" *ngIf="distribution; else noDist">
+                    <svg viewBox="0 0 160 160" class="donut-chart">
+                        <circle cx="80" cy="80" r="60" class="donut-ring" />
+                        <ng-container *ngFor="let segment of distributionSegments">
+                            <circle cx="80" cy="80" r="60" class="donut-segment" [attr.stroke]="segment.color"
+                                [attr.stroke-dasharray]="segment.dashArray" [attr.stroke-dashoffset]="segment.offset" />
+                        </ng-container>
+                    </svg>
+                    <div class="distribution-legend">
+                        <div *ngFor="let segment of distributionSegments" class="legend-item">
+                            <span class="legend-swatch" [style.background]="segment.color"></span>
+                            <span>{{ segment.label }} {{ segment.percentage }}%</span>
+                        </div>
+                    </div>
+                </div>
+                <ng-template #noDist>
+                    <p class="empty-state">No distribution data available.</p>
+                </ng-template>
+            </section>
+
+            <section class="panel insight-panel">
+                <div class="panel-header">
+                    <h3>Insight</h3>
+                    <span>Actionable suggestions for better consistency</span>
+                </div>
+                <div class="insight-card" *ngIf="insight; else noInsight">
+                    <p [class.warning]="insight.type === 'warning'" [class.success]="insight.type === 'success'"
+                        [class.info]="insight.type === 'info'">
+                        {{ insight.insight }}
+                    </p>
+                </div>
+                <ng-template #noInsight>
+                    <p class="empty-state">No insights available for this month.</p>
+                </ng-template>
+            </section>
+        </div>
+
+        <section class="panel missed-panel">
+            <div class="panel-header">
+                <h3>Performance Summary</h3>
+                <span>Daily quality and streak analysis</span>
+            </div>
+            <div class="missed-summary">
+                <div>
+                    <strong>Longest inactivity streak</strong>
+                    <p>{{ summary?.longestInactivityStreak || 0 }} days</p>
+                </div>
+                <div>
+                    <strong>DSA</strong>
+                    <p>{{ summary?.dsaCount || 0 }} sessions</p>
+                </div>
+                <div>
+                    <strong>Theory</strong>
+                    <p>{{ summary?.theoryCount || 0 }} sessions</p>
+                </div>
+                <div>
+                    <strong>Project</strong>
+                    <p>{{ summary?.projectCount || 0 }} sessions</p>
+                </div>
+                <div>
+                    <strong>Resume</strong>
+                    <p>{{ summary?.resumeCount || 0 }} sessions</p>
+                </div>
+                <div>
+                    <strong>Other</strong>
+                    <p>{{ summary?.otherCount || 0 }} sessions</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel resume-panel">
+            <div class="panel-header">
+                <div>
+                    <h3>Resume Intelligence</h3>
+                    <span>Match your resume to the job description and get improvement recommendations.</span>
+                </div>
+            </div>
+
+            <div class="resume-form">
+                <div class="form-row">
+                    <label for="resumeFile">Upload Resume</label>
+                    <input id="resumeFile" type="file" accept=".pdf,.docx,.txt"
+                        (change)="onResumeFileSelected($event)" />
+                </div>
+                <div class="form-row">
+                    <label for="jobDescription">Job Description</label>
+                    <textarea id="jobDescription" [(ngModel)]="jobDescription" rows="5"
+                        placeholder="Paste the target job description here"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button class="action-button" type="button" (click)="analyzeResume()"
+                        [disabled]="resumeLoading">Analyze Resume</button>
+                    <span *ngIf="resumeLoading" class="loading-label">Analyzing resume...</span>
+                </div>
+                <div *ngIf="resumeError" class="error-text">{{ resumeError }}</div>
+            </div>
+
+            <div *ngIf="resumeAnalysis" class="resume-results">
+                <div class="resume-summary">
+                    <div>
+                        <h4>Overall Match</h4>
+                        <p>{{ resumeAnalysis.matchScore }}%</p>
+                    </div>
+                    <div>
+                        <h4>ATS Readiness</h4>
+                        <p>{{ resumeAnalysis.atsScore }}%</p>
+                    </div>
+                </div>
+
+                <div class="result-block">
+                    <h4>Summary</h4>
+                    <p>{{ resumeAnalysis.summary }}</p>
+                </div>
+
+                <div class="result-block">
+                    <h4>Strong Matches</h4>
+                    <div class="tag-list">
+                        <span *ngFor="let match of resumeAnalysis.strongMatches" class="tag">{{ match }}</span>
+                        <span *ngIf="resumeAnalysis.strongMatches.length === 0" class="empty-state">No strong keyword
+                            matches found yet.</span>
+                    </div>
+                </div>
+
+                <div class="result-block">
+                    <h4>Missing Skills</h4>
+                    <div class="tag-list">
+                        <span *ngFor="let skill of resumeAnalysis.missingSkills" class="tag tag-warning">{{ skill
+                            }}</span>
+                        <span *ngIf="resumeAnalysis.missingSkills.length === 0" class="empty-state">No missing skills
+                            detected.</span>
+                    </div>
+                </div>
+
+                <div class="result-block">
+                    <h4>Recommendations</h4>
+                    <ul>
+                        <li *ngFor="let recommendation of mergedRecommendations">{{ recommendation }}</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+</section>

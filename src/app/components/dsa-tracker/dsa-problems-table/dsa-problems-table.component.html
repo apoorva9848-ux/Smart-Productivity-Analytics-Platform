@@ -1,0 +1,90 @@
+<div class="dsa-problems-table">
+    <div *ngIf="error" class="error-message">
+        {{ error }}
+    </div>
+
+    <div class="table-wrapper">
+        <table *ngIf="problems.length > 0">
+            <thead>
+                <tr>
+                    <th>Problem Name</th>
+                    <th>Date Solved</th>
+                    <th>Difficulty</th>
+                    <th>Pattern</th>
+                    <th>Link</th>
+                    <th>Notes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let problem of problems" [class.editing]="editingId === problem.id">
+                    <!-- Problem Name -->
+                    <td class="name-cell">
+                        <span *ngIf="editingId !== problem.id">{{ problem.name }}</span>
+                        <input *ngIf="editingId === problem.id" [(ngModel)]="editingData.name" type="text"
+                            class="edit-input">
+                    </td>
+
+                    <!-- Date Solved -->
+                    <td class="date-cell">
+                        <span *ngIf="editingId !== problem.id">{{ problem.dateSolved | date: 'MMM d, yyyy' }}</span>
+                        <input *ngIf="editingId === problem.id" type="date"
+                            [value]="getDateString(editingData.dateSolved)" (change)="setDateFromEvent($event)"
+                            class="edit-input">
+                    </td>
+
+                    <!-- Difficulty -->
+                    <td class="difficulty-cell">
+                        <span *ngIf="editingId !== problem.id"
+                            [ngClass]="'badge ' + getDifficultyClass(problem.difficulty)">
+                            {{ problem.difficulty }}
+                        </span>
+                        <select *ngIf="editingId === problem.id" [(ngModel)]="editingData.difficulty"
+                            class="edit-input">
+                            <option *ngFor="let diff of difficulties" [value]="diff">{{ diff }}</option>
+                        </select>
+                    </td>
+
+                    <!-- Pattern -->
+                    <td class="pattern-cell">
+                        <span *ngIf="editingId !== problem.id" class="pattern-tag">{{ problem.pattern || '-' }}</span>
+                        <input *ngIf="editingId === problem.id" [(ngModel)]="editingData.pattern" type="text"
+                            placeholder="Pattern" class="edit-input">
+                    </td>
+
+                    <!-- Link -->
+                    <td class="link-cell">
+                        <span *ngIf="editingId !== problem.id">
+                            <a *ngIf="problem.link" [href]="problem.link" target="_blank" rel="noopener">View →</a>
+                            <span *ngIf="!problem.link">-</span>
+                        </span>
+                        <input *ngIf="editingId === problem.id" [(ngModel)]="editingData.link" type="url"
+                            placeholder="Link" class="edit-input">
+                    </td>
+
+                    <!-- Notes -->
+                    <td class="notes-cell">
+                        <span *ngIf="editingId !== problem.id" class="notes-preview">{{ problem.notes || '-' }}</span>
+                        <input *ngIf="editingId === problem.id" [(ngModel)]="editingData.notes" type="text"
+                            placeholder="Notes" class="edit-input">
+                    </td>
+
+                    <!-- Actions -->
+                    <td class="actions-cell">
+                        <div *ngIf="editingId !== problem.id" class="action-buttons">
+                            <button (click)="startEdit(problem)" class="btn btn-sm btn-edit" title="Edit">✏️</button>
+                            <button (click)="deleteProblem(problem.id)" class="btn btn-sm btn-delete"
+                                title="Delete">🗑️</button>
+                        </div>
+                        <div *ngIf="editingId === problem.id" class="action-buttons editing">
+                            <button (click)="saveEdit(problem.id)" class="btn btn-sm btn-save" [disabled]="loading"
+                                title="Save">✓ Save</button>
+                            <button (click)="cancelEdit()" class="btn btn-sm btn-cancel" title="Cancel">✕
+                                Cancel</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

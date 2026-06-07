@@ -1,0 +1,75 @@
+<div class="dsa-tracker">
+    <h2>DSA Problem Tracker</h2>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="error-message">
+        <p>{{ error }}</p>
+    </div>
+
+    <!-- Statistics -->
+    <div *ngIf="problems.length > 0" class="statistics">
+        <div class="stat-box">
+            <span class="stat-label">Total</span>
+            <span class="stat-value">{{ getStatistics().total }}</span>
+        </div>
+        <div class="stat-box easy">
+            <span class="stat-label">Easy</span>
+            <span class="stat-value">{{ getStatistics().easy }}</span>
+        </div>
+        <div class="stat-box medium">
+            <span class="stat-label">Medium</span>
+            <span class="stat-value">{{ getStatistics().medium }}</span>
+        </div>
+        <div class="stat-box hard">
+            <span class="stat-label">Hard</span>
+            <span class="stat-value">{{ getStatistics().hard }}</span>
+        </div>
+    </div>
+
+    <!-- Add Problem Form -->
+    <app-dsa-problem-form (problemCreated)="onProblemCreated($event)"></app-dsa-problem-form>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <h3>Filter Problems</h3>
+        <div class="filter-controls">
+            <select [(ngModel)]="selectedFilter" class="select-control">
+                <option value="all">All Problems</option>
+                <option value="difficulty">By Difficulty</option>
+                <option value="pattern">By Pattern</option>
+            </select>
+
+            <div *ngIf="selectedFilter === 'difficulty'" class="filter-input">
+                <select [(ngModel)]="filterValue" class="select-control">
+                    <option value="">Select Difficulty</option>
+                    <option *ngFor="let diff of difficulties" [value]="diff">{{ diff }}</option>
+                </select>
+            </div>
+
+            <div *ngIf="selectedFilter === 'pattern'" class="filter-input">
+                <select [(ngModel)]="filterValue" class="select-control">
+                    <option value="">Select Pattern</option>
+                    <option *ngFor="let pattern of patterns" [value]="pattern">{{ pattern }}</option>
+                </select>
+            </div>
+
+            <button (click)="applyFilter()" class="btn btn-primary">Apply Filter</button>
+            <button (click)="resetFilter()" class="btn btn-secondary">Reset</button>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div *ngIf="loading" class="loading">
+        <p>Loading...</p>
+    </div>
+
+    <!-- Problems Table -->
+    <app-dsa-problems-table [problems]="problems" (problemUpdated)="onProblemUpdated($event)"
+        (problemDeleted)="onProblemDeleted($event)">
+    </app-dsa-problems-table>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && problems.length === 0" class="empty-state">
+        <p>No DSA problems found. Start by adding one above!</p>
+    </div>
+</div>

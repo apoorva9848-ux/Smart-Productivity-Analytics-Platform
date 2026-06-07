@@ -1,0 +1,81 @@
+# IDE and editor
+.vscode/
+.vscode/extensions/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Node, packages, build
+node_modules/
+dist/
+build/
+
+# .NET
+bin/
+obj/
+
+# Maven local repo / caches
+.m2/
+
+# OneDrive / personal desktop dumps
+OneDrive/
+OneDrive/Desktop/
+
+# Logs and temp
+*.log
+*.tmp
+
+# VS/IDE artifacts
+*.suo
+*.user
+*.vsix
+
+# Large binaries
+*.zip
+*.tar
+*.exe
+*.dll
+*.pdb
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.js
+/typings
+
+# System files
+.DS_Store
+Thumbs.db

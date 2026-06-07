@@ -1,0 +1,94 @@
+<div class="ai-insights-container">
+    <div class="header">
+        <div>
+            <h2>Weekly AI Insights</h2>
+            <p class="header-note">Choose a tone and generate feedback tailored to your weekly progress.</p>
+        </div>
+
+        <div class="header-actions">
+            <div class="mode-selector">
+                <label for="insight-mode">Analysis Mode:</label>
+                <select id="insight-mode" [(ngModel)]="selectedMode" class="mode-select">
+                    <option value="normal">Normal</option>
+                    <option value="brutal">Brutal Reality Check</option>
+                    <option value="motivational">Motivational</option>
+                </select>
+            </div>
+
+            <button class="btn btn-primary" (click)="generateInsights()" [disabled]="isLoading">
+                {{ isLoading ? 'Analyzing your progress...' : 'Generate Weekly Insights' }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="alert alert-error">
+        {{ error }}
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!hasGenerated && !isLoading && !error" class="empty-state">
+        <p>Click the button above to generate your weekly insights based on your recent activity.</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Analyzing your progress...</p>
+    </div>
+
+    <!-- Results State -->
+    <div *ngIf="insight && !isLoading" class="insights-result">
+        <div class="summary-section" *ngIf="insight.summary">
+            <p class="summary-label">One-line summary</p>
+            <p class="summary-text">{{ insight.summary }}</p>
+        </div>
+
+        <!-- Visual Stats -->
+        <div class="stats-section">
+            <h3>📈 Your Weekly Stats</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-label">Study Consistency:</span>
+                    <span class="stat-value">{{ insight.studyConsistency }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">DSA Problems:</span>
+                    <span class="stat-value">{{ insight.dsaStats }}</span>
+                </div>
+                <div class="stat-item" *ngFor="let topic of insight.topicProgress | keyvalue">
+                    <span class="stat-label">{{ topic.key }}:</span>
+                    <span class="stat-value">{{ topic.value }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Insight Section -->
+        <div class="insight-section">
+            <h3>🔥 Reality Check</h3>
+            <p class="insight-text">{{ insight.insight }}</p>
+        </div>
+
+        <div class="insights-section">
+            <h3>⚠️ Areas for Improvement</h3>
+            <ul class="weaknesses-list">
+                <li *ngFor="let weakness of insight.weaknesses" class="weakness-item">
+                    <span class="item-icon">⚠️</span>
+                    <span class="item-content">
+                        <strong>{{ getWeaknessLabel(weakness) }}</strong>{{ getWeaknessDetail(weakness) }}
+                    </span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="insights-section">
+            <h3>💡 Action Plan</h3>
+            <ul class="suggestions-list">
+                <li *ngFor="let suggestion of insight.suggestions" class="suggestion-item">
+                    <span class="item-icon">{{ getSuggestionIcon(suggestion) }}</span>
+                    <span class="item-content">{{ suggestion }}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
